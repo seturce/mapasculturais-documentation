@@ -44,12 +44,9 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
   
   ```
   ubuntu@server# nodejs -v
-  ~ v12.18.3
   ```
-
   ```
   ubuntu@server# npm -v
-  ~ 6.14.6
   ```
   
   ####  Instale o postgresql e postgis: 

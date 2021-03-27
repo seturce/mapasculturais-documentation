@@ -209,7 +209,7 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
       try_files $uri =404;
       include fastcgi_params;
       fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-      fastcgi_pass unix:/var/run/php/php7.2-fpm-$site_name.sock;
+      fastcgi_pass unix:/var/run/php-fpm/mapas.sock;
       client_max_body_size 0;
     }
 
@@ -227,10 +227,10 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
   root@server# ln -s /etc/nginx/sites-available/mapas.conf /etc/nginx/sites-enabled/mapas.conf
 ```
 
-### Configurações pool do php7.2-fpm: Crie o arquivo ```/etc/php/7.2/fpm/pool.d/mapas.conf```. Muita atenção na alteração da linha ```listen = /var/run/php/php7.2-fpm-meu.dominio.gov.br.sock``` pois o nome do arquivo .sock precisará ser extamente como foi configurado do arquivo ```/etc/nginx/sites-available/mapas.conf```. O diretório ```/var/run/php/``` podrá mudar dependendo da versão que estiver trabalhando
+### Configurações pool do php7.2-fpm: Crie o arquivo ```/etc/php-fpm.d/mapa.conf```. Muita atenção na alteração da linha ```listen = /var/run/php-fpm/mapas.sock``` pois o nome do arquivo .sock precisará ser extamente como foi configurado do arquivo ```/etc/nginx/sites-available/mapas.conf```. O diretório ```/var/run/php/``` podrá mudar dependendo da versão que estiver trabalhando
 
 ```console
-  root@server#  vim /etc/php-fpm.d/mapa.conf
+  root@server# vi /etc/php-fpm.d/mapa.conf
 ```
 
 ```txt

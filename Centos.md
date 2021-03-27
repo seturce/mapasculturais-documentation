@@ -414,8 +414,72 @@ _Nota: Em nosso projeto utilizamos apenas a autenticação Padrão e Google, por
 ### Reiniciando serviços php-fpm e nginx
 
 ```console
-# systemctl restart php-fpm
-# systemctl restart nginx
+  root@server# systemctl restart php-fpm
+  root@server# systemctl restart nginx
 ```
 
-### Prontinho!! Após o procedimento você deverá ser capaz de acessar a página de autenticação utilizando MultipleLocalAuth
+## 6. Configurações do serviço de atualização de permissões do sistema
+
+_Nota: O Mapa Cultural possui um serviço (script bash) que atualiza as permissão de acesso (autorização) dos usuários esse serviço precisa rodar em background para manter as autorizações atualizadas, permitindo que novos agentes tenham permissão de inscrição em editais, administrar entidades do sistema, ou até mesmo os avaliadores terem permissão de realizar e visualizar avaliações em editais
+
+### Criar o script que vai rodar em segundo plano
+
+```console
+  root@server# su - mapas
+  mapas@server# mkdir /srv/mapas/scripts
+  mapas@server# vi /srv/mapas/scripts/recreate-pending-pcache-cron.sh
+```
+
+```txt
+  !/bin/bash
+
+  while [ true ]; do
+    /srv/mapas/mapasculturais/scripts/recreate-pending-pcache.sh
+    
+    if [ -z "$PENDING_PCACHE_RECREATION_INTERVAL" ]; then
+      sleep 60
+    else
+      sleep $PENDING_PCACHE_RECREATION_INTERVAL
+    fi
+
+  done
+```
+
+```console
+chmod +x /srv/mapas/scripts/recreate-pending-pcache-cron.sh
+```
+
+### Configurar o daemon do servidor
+
+```console
+  mapas@server# vi /etc/systemd/system/recreate-pcache.service
+```
+
+```txt
+  [Unit]
+  Description=Pending Cache
+
+  [Service]
+  Type=simple
+  WorkingDirectory=/srv/mapas/scripts
+  User=mapas
+  Restart=always
+  RestartSec=10
+  ExecStart=/srv/mapas/scripts/recreate-pending-pcache-cron.sh
+
+  [Install]
+  WantedBy=multi-user.target
+```
+
+```console
+  root@server# systemctl daemon-reload
+  root@server# systemctl start recreate-pcache.service
+```
+
+#### Testar se o serviço esta rodando sem erros
+
+```console
+  root@server# systemctl status recreate-pcache.service -l
+```
+
+### Pronto!! Após o procedimento você deverá ser capaz de acessar o sistema com servidor web, php, base de dados, autenticação e serviço de permissoes funcionando

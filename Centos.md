@@ -2,204 +2,184 @@
 
 Este repositório irá armazenar as configurações necessárias para efetuas a instalaçao passo-a-passo da aplicação mapasculturais tendo como base esta [documentação](http://docs.mapasculturais.org/mc_deploy/), tivemos que fazer algumas mudanças do tutorial original para que fosse possível a sua instalaçao.
 
-# 1. Configuração da máquina ( EC2 amazon )
+## 1. Configuração da máquina ( EC2 amazon )
 
- * CENTOS 7
- * vCPUS 2
- * 4GB RAM
- * SSD 50GB
+* CENTOS 7
+* vCPUS 2
+* 4GB RAM
+* SSD 50GB
 
 _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a primeira instalação, o procedimento será o mesmo em sua máquina de produção, para ter acesso aos requisitos mínimos acesse para rodar em produção acesse [este Link](https://github.com/mapasculturais/mapasculturais#hardware-requisitos-para-instala%C3%A7%C3%A3o)_
 
-# 2. Softwares Requeridos
+## 2. Softwares Requeridos
 
-  #### Atualize os repositórios de referência de sua máquina:
+### Atualize os repositórios de referência de sua máquina
   
-  ```
+```console
+  root@server# cd ~
   root@server# yum update -y
-  ```
-  ```
   root@server# yum install epel-release
-  ```
+```
+
+### Instale as dependências
   
-  #### Instale as dependências:
-  
-  ```
+```console
   root@server# yum install yum-utils -y
-  ```
-  ```
   root@server# yum install git curl gcc-c++ make zip unzip -y 
-  ``` 
-    
-  #### Instale a versão stable mais nova do nodejs:
+```
+
+### Instale a versão stable mais nova do nodejs
   
-  ```
+```console
   root@server# curl -sL https://rpm.nodesource.com/setup_10.x | sudo -E bash -
-  ```
-  ```
   root@server# yum install nodejs -y
-  ```
-  
-  #### Verificando se foi instalada a versão mais recente do NodeJS e do NPM:
-  
-  ```
-  ubuntu@server# nodejs -v
-  ```
-  ```
-  ubuntu@server# npm -v
-  ```
-  
-  ####  Instale o postgresql e postgis: 
-  
-  ```
-  ubuntu@server# sudo apt-get install postgresql-10 postgresql-contrib postgis postgresql-10-postgis-2.4 postgresql-10-postgis-2.4-scripts -y
-  ```
-  
-  ####  Instale o php7.2, php7.2-fpm e extensões do php utilizadas no sistema
-  
-  ``` 
-  ubuntu@server# sudo apt-get install php7.2 php7.2-gd php7.2-cli php7.2-json php7.2-curl php7.2-pgsql php-apcu php7.2-fpm imagemagick libmagickcore-dev libmagickwand-dev php7.2-imagick -y
-  ```
-  
-  #### Instale o nginx
-  
-  ```
-  ubuntu@server# sudo apt-get install nginx
-  ```
-  
-  #### Instale o gerenciador de dependências do PHP Composer
-  
-  ```
-  ubuntu@server# curl -sS https://getcomposer.org/installer | php
-  ```
-  ```
-  ubuntu@server# sudo mv composer.phar /usr/local/bin/composer.phar
-  ```
-  
-  #### Também é importante ter o pacote zip instalado no seu servidor. Ele é usado para gerar o pacote com os anexos enviados nas inscrições. Caso ainda não tenha:
-  
-  ```
-  sudo apt-get install zip unzip
-  ```
-  
-  #### No Ubuntu o executável do NodeJS se chama nodejs, porém para o correto funcionamento das bibliotecas utilizadas, o executável deve se chamar node. Para isto criamos um link simbólico com o comando abaixo:
-  
-  ```
-  ubuntu@server# sudo update-alternatives --install /usr/bin/node node /usr/bin/nodejs 10
-  ```
-  #### Instalando os minificadores de código Javascript e CSS: uglify-js, uglifycss e autoprefixer:
-  
-  ```
-  ubuntu@server# sudo npm install -g uglify-js2 uglifycss autoprefixer
-  ubuntu@server# sudo update-alternatives --install /usr/bin/uglifyjs uglifyjs /usr/bin/uglifyjs2 10
-  ```
-  
-  #### Instalando o SASS, utilizado para compilar os arquivos CSS:
-  
-  ```
-  ubuntu@server# sudo gem install sass -v 3.4.22
-  ```
-# 3. Clonando o Repositório
+```
 
-  #### Primeiro vamos criar o usuário que rodará a aplicação e que será proprietário do banco de dados, definindo sua home para /srv e colocando-o no grupo www-data:
+### Verificando se foi instalada a versão mais recente do NodeJS e do NPM
   
-  ```
-  ubuntu@server# sudo useradd -G www-data -d /srv/mapas -m mapas
-  ```
-  
-  #### Vamos clonar o repositório usando o usuário criando, então precisamos primeiro "logar" com este usuário:
-  
-  ```
-  ubuntu@server# sudo su - mapas
-  mapas@server$ git clone https://github.com/hacklabr/mapasculturais.git
-  ```
-  #### Agora vamos colocar o repositório na branch master. Caso queira você poderá ver todas as versões dosponíveis [aqui](https://github.com/hacklabr/mapasculturais/releases)
-  
-  ```
-  mapas@server$ cd mapasculturais
-  mapas@server$ git checkout master
-  mapas@server$ git pull origin master
-  ```
-  
-  #### Agora vamos instalar as dependências de PHP utilizando o Composer.
-  
-  ```
-  mapas@server$ cd ~/mapasculturais/src/protected/
-  mapas@server$ composer.phar install
-  ```
-  
-# 4. Banco de Dados
+```console
+  root@server# nodejs -v
+  root@server# npm -v
+```
 
-  #### Vamos voltar ao usuário root para criar o banco de dados.
+### Instalando os minificadores de código Javascript, CSS e SASS
   
-  ```
-  mapas@server$ exit
-  ubntu@server$
-  ```
+```console
+  root@server# npm install -g uglify-js uglifycss autoprefixer terser
+  root@server# yum install rubygem-sass -y
+```
   
-  #### Primeiro vamos criar o usuário no banco de dados com o mesmo nome do usuário do sistema
-  
-  ```
-  ubuntu@server# sudo -u postgres psql -c "CREATE USER mapas"
-  ```
-  
-  #### Agora vamos criar a base de dados para a aplicação com o mesmo nome do usuário
-  
-  ```
-  ubuntu@server# sudo -u postgres createdb --owner mapas mapas
-  ```
-  #### Criar as extensões necessárias no banco
-  
-  ```
-  ubuntu@server# sudo -u postgres psql -d mapas -c "CREATE EXTENSION postgis;"
-  ubuntu@server# sudo -u postgres psql -d mapas -c "CREATE EXTENSION unaccent;"
-  ```
-  
-  #### Volte a "logar" com o usuário criado e importar o esquema da base de dados
-  
-  ```
-  ubuntu@server# sudo su - mapas
-  mapas@server$ psql -f mapasculturais/db/schema.sql
-  ```
-# 5. Configurações de instalação
-  
-  #### Primeiro crie um arquivo de configuração copiando o arquivo de template de configuração. Este arquivo está preparado para funcionar com este guia, utilizando o método de autenticação Fake.
-  
-  ```
-  mapas@server$ cp mapasculturais/src/protected/application/conf/config.template.php mapasculturais/src/protected/application/conf/config.php
-  ```
-  
-  #### Criando diretórios de log, files e estilo
-  
-  ```
-  $ exit
-  ubuntu@server# sudo mkdir /var/log/mapasculturais
-  ubuntu@server# sudo chown mapas:www-data /var/log/mapasculturais
-  ```
-  
-  #### Com o usuário criado, crie a pasta para os assets, para os uploads e para os uploads privados (arquivos protegidos, como anexos de inscrições em oportunidades):
-  
-  ```
-  ubuntu@server# sudo su - mapas
-  mapas@server$ mkdir mapasculturais/src/assets
-  mapas@server$ mkdir mapasculturais/src/files
-  mapas@server$ mkdir mapasculturais/private-files
-  ```
-  
-# 6. Configuração do nginx
-  
-  #### Precisamos criar o virtual host do nginx para a aplicação. Para isto crie, como root, o arquivo /etc/nginx/sites-available/mapas.conf
-  
-  ```
-  mapas@server$ exit
-  ubuntu@server# sudo vi /etc/nginx/sites-available/mapas.conf
-  ```
-  
-  _Eu costumo utilizar o vi, mas você pode usar o vim, nano e afins para fazer a edição deste arquivo_
-  
-  #### Coloque o conteúdo abaixo dentro do arquivo /etc/nginx/sites-available/mapas.conf criado anteriormente: Muita atenção aqui, pois você precisará subistituir todos os "meu.dominio.gov.br" pelo seu domínio ou IP fixo dependendo de qual for o seu caso.
-  
-  ```
+### Instale o nginx
+
+```console
+  root@server# yum install nginx -y
+  root@server# systemctl start nginx
+  root@server# systemctl enable nginx
+```
+
+### Instale o php7.2, php7.2-fpm, extensões do php utilizadas no sistema e gerenciador de dependências do PHP Composer
+
+```console
+  root@server# vi /etc/yum.repos.d/CentOS-Base.repo
+```
+
+```txt
+    [base]
+      exclude=php*
+    [updates]
+      exclude=php*
+```
+
+```console
+  root@server# wget https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-7-12.noarch.rpm
+  root@server# wget http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+  root@server# yum -y install epel-release
+  root@server# rpm -Uvh epel-release-latest-7.noarch.rpm
+  root@server# rpm -Uvh remi-release-7.rpm
+  root@server# yum-config-manager --enable remi-php72
+  root@server# yum install php php-fpm php-pdo php-json php-common php-cli php-xml php-pgsql php-mbstring php-mcrypt php-pecl-apcu php-pecl-imagick php-opcache php-doctrine-orm php-pecl-zip php-mysql -y
+  root@server# systemctl start php-fpm
+  root@server# systemctl enable php-fpm
+  root@server# cd ~
+  root@server# url -sS https://getcomposer.org/installer | php
+  root@server# mv composer.phar /usr/bin/composer
+```
+
+
+## 3. Baixando o projeto e configurando
+
+### Adicionando o usuario da aplicação e download do projeto, tema, e plugins através do github
+
+```console
+  root@server# useradd -G nginx -d /srv/mapas -m mapas
+  root@server# su - mapas
+  mapas@server# git clone https://github.com/secultce/mapasculturais.git
+  mapas@server# cd ~/mapasculturais
+  mapas@server# git checkout production
+  mapas@server# cd ~/mapasculturais/src/protected/application/themes
+  mapas@server# git clone https://github.com/secultce/theme-Ceara.git Ceara
+  mapas@server# cd ~/mapasculturais/src/protected/application/plugins
+  mapas@server# git clone https://github.com/secultce/plugin-MultipleLocalAuth.git MultipleLocalAuth
+```
+
+### Com o usuário criado, crie a pasta para os assets, para os uploads e para os uploads privados (arquivos protegidos, como anexos de inscrições em oportunidades)
+
+```console
+  root@server# su - mapas
+  mapas@server# mkdir ~/mapasculturais/src/assets
+  mapas@server# mkdir ~/mapasculturais/src/files
+  mapas@server# mkdir ~/mapasculturais/private-files
+  mapas@server# mkdir ~/mapasculturais/private-files/sessions  
+```
+
+### Configurando o projeto no nginx
+
+```console
+  root@server# mkdir /var/log/mapasculturais
+  root@server# chown mapas:nginx /var/log/mapasculturais
+  root@server# mkdir /etc/nginx/sites-available
+  root@server# mkdir /etc/nginx/sites-enabled
+
+  root@server# vim /etc/nginx/nginx.conf
+    // Agora adicione include da pasta "sites-enabled" no fim do arquivo
+      include /etc/nginx/sites-enabled/*.conf;
+    // Comente todo o codigo de configuração do "server"
+      #  server {
+      # ...
+      # ...
+      # }
+```
+
+#### Precisamos criar o virtual host do nginx para a aplicação. Para isto crie, como root, o arquivo /etc/nginx/sites-available/mapas.conf
+
+```console
+  root@server# vim /etc/nginx/sites-available/mapas.conf 
+```
+
+#### Configurações sem domínio
+
+```txt
+  server {
+    listen 80 default_server;
+    listen [::]:80 default_server;  
+    server_name mapacultural.secult.ce.gov.br;
+    access_log /var/log/nginx/mapas.access.log;
+    error_log  /var/log/nginx/mapas.error.log;
+
+    client_max_body_size 10M;
+
+    root /srv/mapas/mapasculturais/src/;
+    index index.php;
+
+    location / {  
+      try_files $uri $uri/ /index.php?$args;
+    }	
+
+    location ~ /files/.*\.php$ {
+      deny all;
+      return 403;
+    }
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|woff|pdf|odt|xls)$ {
+      expires 1w;
+      log_not_found off;
+    }
+
+    location ~ \.php$ {
+      try_files $uri =404;
+      include fastcgi_params;
+      fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+      fastcgi_pass unix:/var/run/php-fpm/mapas.sock;
+      client_max_body_size 10M;
+    }
+
+    charset utf-8;
+  }
+```
+
+#### Configurações com domínio
+
+```txt
   server {
     set $site_name meu.dominio.gov.br;
 
@@ -242,268 +222,200 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
     return 301 $scheme://meu.dominio.gov.br$request_uri;
   }
   ```
-  
-  #### Feita a alteração no arquivo, salve!
-  
-  #### Crie o link para habilitar o virtual host
-  
-  ```
-  ubuntu@server# sudo ln -s /etc/nginx/sites-available/mapas.conf /etc/nginx/sites-enabled/mapas.conf
-  ```
-  
-  #### Remover o arquivo default da pasta /etc/nginx/sites-available/ e /etc/nginx/sites-enabled/
-  
-  ```
-  ubuntu@server# sudo rm /etc/nginx/sites-available/default
-  ubuntu@server# sudo rm /etc/nginx/sites-enabled/default
-  ```
-  
-  #### Configurações pool do php7.2-fpm: Crie o arquivo ```/etc/php/7.2/fpm/pool.d/mapas.conf```. Muita atenção na alteração da linha ```listen = /var/run/php/php7.2-fpm-meu.dominio.gov.br.sock``` pois o nome do arquivo .sock precisará ser extamente como foi configurado do arquivo ```/etc/nginx/sites-available/mapas.conf```. O diretório ```/var/run/php/``` podrá mudar dependendo da versão que estiver trabalhando. 
-  
-  ```
-  ubuntu@server# sudo vi /etc/php/7.2/fpm/pool.d/mapas.conf
-  ```
-  
-  _Eu costumo utilizar o vi, mas você pode usar o vim, nano e afins para fazer a edição deste arquivo_
-  
-  ```
+
+```console
+  root@server# ln -s /etc/nginx/sites-available/mapas.conf /etc/nginx/sites-enabled/mapas.conf
+```
+
+### Configurações pool do php7.2-fpm: Crie o arquivo ```/etc/php/7.2/fpm/pool.d/mapas.conf```. Muita atenção na alteração da linha ```listen = /var/run/php/php7.2-fpm-meu.dominio.gov.br.sock``` pois o nome do arquivo .sock precisará ser extamente como foi configurado do arquivo ```/etc/nginx/sites-available/mapas.conf```. O diretório ```/var/run/php/``` podrá mudar dependendo da versão que estiver trabalhando
+
+```console
+  root@server#  vim /etc/php-fpm.d/mapa.conf
+```
+
+```txt
   [mapas]
-listen = /var/run/php/php7.2-fpm-meu.dominio.gov.br.sock
-listen.owner = mapas
-listen.group = www-data 
-user = mapas
-group = www-data
-catch_workers_output = yes
-pm = dynamic
-pm.max_children = 10
-pm.start_servers = 1
-pm.min_spare_servers = 1
-pm.max_spare_servers = 3
-pm.max_requests = 500
-chdir = /srv/mapas
-; php_admin_value[open_basedir] = /srv/mapas:/tmp
-php_admin_value[session.save_path] = /tmp/
-; php_admin_value[error_log] = /var/log/mapasculturais/php.error.log
-; php_admin_flag[log_errors] = on
-php_admin_value[display_errors] = 'stderr'
-  ```
-  
-# 7. Concluindo
-  
-  #### Para finalizar, precisamos popular o banco de dados com os dados iniciais e executar um script que entre outras coisas compila e minifica os assets, otimiza o autoload de classes do composer e roda atualizações do banco.
-  
-  
-  ```
-  ubuntu@server# sudo su - mapas
-  mapas@server$ psql -f mapasculturais/db/initial-data.sql
-  mapas@server$ ./mapasculturais/scripts/deploy.sh
-  ```
-  
-  #### Reinicie os serviços do nginx e php7.2-fpm
-  
-  
-  ```
-  ubuntu@server# sudo service nginx restart
-  ubuntu@server# sudo service php7.2-fpm restart
-  ```
- 
-_A partir deste momento sua aplicação estará disponível para acesso utilizando a Autenticação Fake_
+    listen = /var/run/php-fpm/mapas.sock
+    listen.owner = mapas
+    listen.group = nginx
+    user = mapas
+    group = nginx
+    catch_workers_output = yes
+    pm = dynamic
+    pm.max_children = 20
+    pm.start_servers = 5
+    pm.min_spare_servers = 5
+    pm.max_spare_servers = 10
+    pm.max_requests = 500
+    chdir = /srv/mapas
+    php_admin_value[session.save_path] = /tmp/
+    php_admin_value[error_log] = /var/log/mapasculturais/php.error.log
+    php_admin_flag[log_errors] = on
+    php_admin_value[display_errors] = 'stderr'
+```
 
+## 4. Banco de dados
 
-# Instalação do certificado SSL com LetsEncrypt
+### Instale o postgresql, postgis e inicializa o servico postgresql
+  
+```console
+  root@server# yum-config-manager --enable pgdg96
+  root@server# yum -y install https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+  root@server# yum install postgresql96 postgresql96-server postgresql96-contrib postgresql96-libs -y
+  root@server# yum install postgis24_96
+  root@server# /usr/pgsql-9.6/bin/postgresql96-setup initdb
+  root@server# systemctl start postgresql-9.6
+  root@server# systemctl status postgresql-9.6
+  root@server# systemctl enable postgresql-9.6
+  root@server# vi /var/lib/pgsql/9.6/data/pg_hba.conf
+```
 
-  ## Passo 1 — Instalando o Certbot
-  
-  #### Primeiro, adicione o repositório:
+```txt
+  // Edite a linha
+    host    all             all             127.0.0.1/32            ident
+  //para 
+    host    all             all             127.0.0.1/32            md5
+```
 
-  ```
-  ubuntu@server# sudo add-apt-repository ppa:certbot/certbot
-  ```
+```console
+  root@server# systemctl restart postgresql-9.6
+```
 
-  #### Você vai precisar pressionar ENTER para aceitar. Depois, atualize a lista de pacotes para pegar as novas informações de pacotes do repositório:
+### Criando usuario e database
 
-  ```
-  ubuntu@server# sudo apt-get update
-  ```
-  #### E, finalmente, instale o pacote Nginx do Certbot com o apt-get:
+```console
+  root@server# su - postgres 
+  postgres@server# createuser mapas
+  postgres@server# createdb --owner mapas mapas
+  postgres@server# psql 
+  psql@server# alter user "mapas" with encrypted password 'mapas';
+  psql@server# grant all privileges on database mapas to "mapas";
+  psql@server# \c mapas
+  psql@server# CREATE EXTENSION postgis;
+  psql@server# CREATE EXTENSION unaccent;
+  psql@server# \q
+  postgres@server# psql -U mapas -d mapas -f /srv/mapas/mapasculturais/db/schema.sql
+  postgres@server# psql -U mapas -d mapas -f /srv/mapas/mapasculturais/db/initial-data.sql
+  postgres@server# exit
+```
 
-  ```
-  ubuntu@server# sudo apt-get install python-certbot-nginx
-  ```
+## 5. Configurações do sistema
   
+### Primeiro crie um arquivo de configuração copiando o arquivo de template de configuração. Este arquivo está preparado para funcionar com este guia, utilizando o método de autenticação Fake
   
-  ## Passo 2 — Confirmando a Configuração do Nginx
-  
-  #### Para verificar, abra o arquivo de bloco do servidor para o seu domínio usando o ```vi``` ou o seu editor de textos favorito:
-  
-  ```
-  ubuntu@server# sudo vi /etc/nginx/sites-available/mapas.conf
-  ```
-  
-  #### Verifique se todas as informações abaixo foram configuradas corretamente, já fizemos nas [etapas anteriores](https://github.com/wiusmarques/mapasculturais#6-configura%C3%A7%C3%A3o-do-nginx), iremos apenas conferir.
-  
-  ```
-  set $site_name meu.dominio.gov.br;
-  server_name  meu.dominio.gov.br;
-  server_name meu.dominio.gov.br;
-  return 301 $scheme://meu.dominio.gov.br$request_uri;
-  ```
-  
-  #### Depois de conferir o arquivo, saia do seu editor, e verifique a sintaxe da edição da sua configuração:
-  
-  ```
-  ubuntu@server# sudo nginx -t
-  ```
-  
-  #### Se você receber um erro, reabra o arquivo de bloco do servidor e verifique se há erros de digitação ou caracteres ausentes. Quando a sintaxe do seu arquivo de configuração estiver correta, recarregue o Nginx para carregar a nova configuração:
-  
-  ```
-  ubuntu@server# sudo systemctl reload nginx
-  ```
-  
-  ## Passo 3 — Permitindo HTTPS Através do Firewall
-  
-  _Cada servidor possuí sua particularidade, garanta que as portas 443(https) e 80(http) estejam liberadas no Firewall [Permitindo HTTPS Através do Firewall](https://www.digitalocean.com/community/tutorials/como-proteger-o-nginx-com-o-let-s-encrypt-no-ubuntu-18-04-pt) vá até o tópico Passo 3 — Permitindo HTTPS Através do Firewall caso esteja utilizando um servidor padrão, no meu caso estou utilizando AWS e por isso o procedimento é um pouco diferente_ 
-  
-  ## Passo 4 — Obtendo um Certificado SSL
-  
-  #### Obtendo o certificado
-  
-  ```
-  ubuntu@server# sudo certbot --nginx -d meu.dominio.gov.br
-  ```
-  
-  #### Se isso for bem sucedido, o certbot perguntará como você gostaria de definir suas configurações de HTTPS.
-  
-  ```
-  Please choose whether or not to redirect HTTP traffic to HTTPS, removing HTTP access.
-  -------------------------------------------------------------------------------
-  1: No redirect - Make no further changes to the webserver configuration.
-  2: Redirect - Make all requests redirect to secure HTTPS access. Choose this for
-  (...)
-  ```
-  
-  #### Escolha 1 para redirecionar não redirecionar o tráfego forçado para HTTPS e 2 para fazer com que todaas as requisições sejam forçadas para HTTPS
-  
-  #### Se isso for bem sucedido, o certibot irá exibir uma mensagem de sucesso:
-  
-  ```
-  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  Congratulations! You have successfully enabled https://meu.dominio.gov.br
+```console
+  root@server# su - mapas
+  mapas@server# cp mapasculturais/src/protected/application/conf/config.template.php mapasculturais/src/protected/application/conf/config.php
+```
 
-  You should test your configuration at:
-  (...)
-  ```
-  
-  ## Passo 5 — Verificando a Auto-Renovação do Certbot
-  
-  ```
-  ubuntu@server# sudo certbot renew --dry-run
-  ```
-  
-  
-  
-_Em uma das máquinas que fiz a instalação precisei reiniciar o serivdor inteiro para que o NGINX funcione corretamente. A configuração do SSL foi feita com base no seguinte [artigo](https://www.digitalocean.com/community/tutorials/como-proteger-o-nginx-com-o-let-s-encrypt-no-ubuntu-18-04-pt)._
-
-# Autenticação - MultipleLocalAuth
+### Autenticação - MultipleLocalAuth
 
   _Após a instalção do Mapa Cultural teremos várias possibilidades para autenticação, mas iremos abordar aqui apenas a autenticação utilizando MultipleLocalAuth que dará ao usuário a possibilidade de fazer a autenticação utilizando contas Locais, Gooogle, Facebook e afins. 
   Após os procedimentos descritos abaixo iremos sair do modo de 'Autenticação Fake'. 
   Para isso iremos utilizar as informações já disponibilidas no repositório [MultipleLocalAuth](https://github.com/secultce/MultipleLocalAuth) e adicionar alguns detalhes com o objetivo de facilitar a implementação_
   
+#### Agora, Faça a edição do arquivo de configuração do mapas utilizando vi ou o editor de sua preferência.
   
-  #### Clonando o repositório, iremos acessar a pasta ```plugins``` do nosso projeto utilizando o usuário mapas
+```console
+mapas@server# vi /srv/mapas/mapasculturais/src/protected/application/conf/config.php
+```
   
-  ```
-  ubuntu@server# sudo su - mapas
-  mapas@server$ cd mapasculturais/src/protected/application/plugins
-  mapas@server$ pwd
-    output: /srv/mapas/mapasculturais/src/protected/application/plugins
-  ```
-  
-  #### Após nos certificarmos de que estamos no diretório correto iremos clonar o repositório MultipleLocalAuth
-  
-  ```
-  mapas@server$ git clone https://github.com/secultce/MultipleLocalAuth.git
-  mapas@server$ exit
-  mapas@server$
-  ```
-  
-  ##### Agora, Faça a edição do arquivo de configuração do mapas utilizando vi ou o editor de sua preferência.
-  
-  ```
-  ubuntu@server# sudo vi /srv/mapas/mapasculturais/src/protected/application/conf/config.php
-  ```
-  
-  _Neste momento teremos três etapas_
+#### Neste momento teremos três etapas_
   
   1- Ativar o plugin
   2- Configurar MultipleLocalAuth como seu Provider de autenticação
   3- Configurar as chaves das redes sociais
   
-  ### 1- Ativar o plugin
+##### 1- Ativar o plugin
   
-  ##### Ainda com o arquivo ```config.php``` aberto adicione a seguinte configuração: 
+###### Ainda com o arquivo ```config.php``` aberto adicione a seguinte configuração: 
   
-  ```
+```php
   'plugins' => [
       // ... outros plugins
       'MultipleLocalAuth' => [
           'namespace' => 'MultipleLocalAuth',
       ],
   ],
-  ```
-  _Nota: A linha acima ficará dentro do array de configurações do arquivo ```config.php``` que estamos editando neste momento._
+```
+
+_Nota: A linha acima ficará dentro do array de configurações do arquivo ```config.php``` que estamos editando neste momento._
   
-  ### 2- Configurar MultipleLocalAuth como seu Provider de autenticação
+##### 2- Configurar MultipleLocalAuth como seu Provider de autenticação
   
-  ##### Procure a linha com o código 
+###### Procure a linha com o código
   
-  ```'auth.provider' => 'Fake'```, 
+  ```'auth.provider' => 'Fake'```,
   
-  #### comente e adicione uma nova ou altere para 
+###### comente e adicione uma nova ou altere para 
   
   ```'auth.provider' => '\MultipleLocalAuth\Provider'```
   
-  ### 3- Configurar as chaves das redes sociais
+##### 3- Configurar as chaves das redes sociais
   
-  ##### Defina a configuração auth.config para definir as estratégias utilizadas e as chaves dos serviços:
+###### Defina a configuração auth.config para definir as estratégias utilizadas e as chaves dos serviços:
   
-  ```
-  'auth.config' => array(
-    'salt' => 'LT_SECURITY_SALT_SECURITY_SALT_SECURITY_SALT_SECURITY_SALT_SECU',
-     'timeout' => '24 hours',
-      'strategies' => [
-         'Facebook' => array(
+```php
+  //'auth.provider' => 'Fake'
+  'auth.provider' => '\MultipleLocalAuth\Provider'
+  'auth.config' => [
+    'salt' => 'LT_SECURITY_SALT_SECURITY_SALT_SECURITY_SALT_SECURITY_SALT_SECU', // string to salt crypto password
+    'timeout' => '24 hours', //timeout
+    'enableLoginByCPF' => true, //login using CPF
+    'metadataFieldCPF' => 'documento', //metadata key in agent_meta to CPF value
+    'userMustConfirmEmailToUseTheSystem' => false, //confirm email after new user 
+    'passwordMustHaveCapitalLetters' => true, //validate strongest passwords Must Have Capital Letters
+    'passwordMustHaveLowercaseLetters' => true, //validate strongest passwords Must Have Lower Letters
+    'passwordMustHaveSpecialCharacters' => true, //validate strongest passwords Must Have Special Characters
+    'passwordMustHaveNumbers' => true, //validate strongest passwords Must Have Numbers
+    'minimumPasswordLength' => 7, //validate  passwords length 
+    'google-recaptcha-secret' => '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe', //google recaptcha
+    'google-recaptcha-sitekey' => '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', //google recaptcha
+    'sessionTime' => 7200, // session time by user in seconds
+    'numberloginAttemp' => '5', // login attempts with error before block user by X seconds
+    'timeBlockedloginAttemp' => '900', // block time user after overcoming login attempts with error
+    'strategies' => [
+         'Facebook' => [
            'app_id' => 'SUA_APP_ID',
            'app_secret' => 'SUA_APP_SECRET', 
            'scope' => 'email'
-         ),
+         ],
 
-        'LinkedIn' => array(
+        'LinkedIn' => [
           'api_key' => 'SUA_API_KEY',
           'secret_key' => 'SUA_SECRET_KEY',
           'redirect_uri' => URL_DO_SEU_SITE . '/autenticacao/linkedin/oauth2callback',
           'scope' => 'r_emailaddress'
-        ),
-        'Google' => array(
+        ],
+        'Google' => [
           'client_id' => 'SEU_CLIENT_ID',
           'client_secret' => 'SEU_CLIENT_SECRET',
           'redirect_uri' => URL_DO_SEU_SITE . '/autenticacao/google/oauth2callback',
           'scope' => 'email'
-        ),
-        'Twitter' => array(
+        ],
+        'Twitter' => [
             'app_id' => 'SUA_APP_ID', 
             'app_secret' => 'SUA_APP_SECRET', 
-        ),
+        ],
 
-      ]
-  ),
-  ```
+      ]        
+  ],
+```
   
-  _Nota: Em nosso projeto utilizamos apenas a autenticação Padrão e Google, portanto foi necessário gerar as chaves utilizando a ferramenta [Google Console Developers](https://console.developers.google.com/apis/credentials), após gerar as chaves basta adiciona-las na configurações citadas acima._  
+_Nota: Em nosso projeto utilizamos apenas a autenticação Padrão e Google, portanto foi necessário gerar as chaves utilizando a ferramenta [Google Console Developers](https://console.developers.google.com/apis/credentials), após gerar as chaves basta adiciona-las na configurações citadas acima._  
   
+### Para finalizar, precisamos executar um script que entre outras coisas compila e minifica os assets, faz o download das dependecias do composer, otimiza o autoload de classes do composer e roda atualizações do banco
   
-  ##### Prontinho!! Após o procedimento você deverá ser capaz de acessar a página de autenticação utilizando MultipleLocalAuth
-  
-  
+```console
+  root@server# su - mapas
+  mapas@server# ./mapasculturais/scripts/deploy.sh
+```
+
+### Reiniciando serviços php-fpm e nginx
+
+```console
+# systemctl restart php-fpm
+# systemctl restart nginx
+```
+
+### Prontinho!! Após o procedimento você deverá ser capaz de acessar a página de autenticação utilizando MultipleLocalAuth

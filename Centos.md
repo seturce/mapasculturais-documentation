@@ -1,13 +1,13 @@
-# Mapas Culturais  - Instalação Ubuntu
+# Mapas Culturais  - Instalação Centos
 
-Este repositório irá armazenar as configurações necessárias para efetuas a instalaçao passo-a-passo da aplicação mapasculturais tendo como base esta [documentação](http://docs.mapasculturais.org/mc_deploy/), em Minas Gerais tivemos que fazer algumas mudanças do tutorial original para que fosse possível a sua instalaçao.
+Este repositório irá armazenar as configurações necessárias para efetuas a instalaçao passo-a-passo da aplicação mapasculturais tendo como base esta [documentação](http://docs.mapasculturais.org/mc_deploy/), tivemos que fazer algumas mudanças do tutorial original para que fosse possível a sua instalaçao.
 
 # 1. Configuração da máquina ( EC2 amazon )
 
- * Ubuntu Server 18.04 LTS
- * vCPUS 1
- * 1GB RAM
- * SSD 30GB
+ * CENTOS 7
+ * vCPUS 2
+ * 4GB RAM
+ * SSD 50GB
 
 _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a primeira instalação, o procedimento será o mesmo em sua máquina de produção, para ter acesso aos requisitos mínimos acesse para rodar em produção acesse [este Link](https://github.com/mapasculturais/mapasculturais#hardware-requisitos-para-instala%C3%A7%C3%A3o)_
 

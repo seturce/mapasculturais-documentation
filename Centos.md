@@ -16,39 +16,30 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
   #### Atualize os repositórios de referência de sua máquina:
   
   ```
-  ubuntu@server# sudo apt-get update 
+  root@server# yum update -y
   ```
   ```
-  ubuntu@server# sudo apt-get upgrade
-  ```
-  
-  #### Instale as dependências diversas:
-  
-  ```
-  ubuntu@server# sudo apt-get install git curl npm ruby2.5 ruby2.5-dev -y
+  root@server# yum install epel-release
   ```
   
-  ####  Atualizar referências para a versão de ruby 2.5:
+  #### Instale as dependências:
   
   ```
-  ubuntu@server# sudo update-alternatives --install /usr/bin/ruby ruby /usr/bin/ruby2.5
+  root@server# yum install yum-utils -y
   ```
   ```
-  ubuntu@server# sudo update-alternatives --install /usr/bin/gem gem /usr/bin/gem2.5
-  ```
-  
+  root@server# yum install git curl gcc-c++ make zip unzip -y 
+  ``` 
+    
   #### Instale a versão stable mais nova do nodejs:
   
   ```
-  ubuntu@server# sudo curl -sL https://deb.nodesource.com/setup_12.x -o nodesource_setup.sh
+  root@server# curl -sL https://rpm.nodesource.com/setup_10.x | sudo -E bash -
   ```
   ```
-  ubuntu@server# sudo bash nodesource_setup.sh
+  root@server# yum install nodejs -y
   ```
-  ```
-  ubuntu@server# sudo apt install nodejs -y
-  ```
-
+  
   #### Verificando se foi instalada a versão mais recente do NodeJS e do NPM:
   
   ```

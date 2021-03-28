@@ -127,7 +127,7 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
   root@server# mkdir /etc/nginx/sites-available
   root@server# mkdir /etc/nginx/sites-enabled
 
-  root@server# vim /etc/nginx/nginx.conf
+  root@server# vi /etc/nginx/nginx.conf
     // Agora adicione include da pasta "sites-enabled" no fim do arquivo
       include /etc/nginx/sites-enabled/*.conf;
     // Comente todo o codigo de configuração do "server"
@@ -140,7 +140,7 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
 #### Precisamos criar o virtual host do nginx para a aplicação. Para isto crie, como root, o arquivo /etc/nginx/sites-available/mapas.conf
 
 ```console
-  root@server# vim /etc/nginx/sites-available/mapas.conf 
+  root@server# vi /etc/nginx/sites-available/mapas.conf 
 ```
 
 #### Configurações sem domínio
@@ -276,7 +276,7 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
   root@server# yum-config-manager --enable pgdg96
   root@server# yum -y install https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
   root@server# yum install postgresql96 postgresql96-server postgresql96-contrib postgresql96-libs -y
-  root@server# yum install postgis24_96
+  root@server# yum install postgis24_96 -y
   root@server# /usr/pgsql-9.6/bin/postgresql96-setup initdb
   root@server# systemctl start postgresql-9.6
   root@server# systemctl status postgresql-9.6

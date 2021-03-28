@@ -85,6 +85,15 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
   root@server# mv composer.phar /usr/bin/composer
 ```
 
+### PHP Configs
+
+```console
+  root@server# vi /etc/php.ini
+```console
+
+```txt
+  variables_order = "EGPCS"
+```
 
 ## 3. Baixando o projeto e configurando
 
@@ -235,23 +244,30 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
 
 ```txt
   [mapas]
-    listen = /var/run/php-fpm/mapas.sock
-    listen.owner = mapas
-    listen.group = nginx
-    user = mapas
-    group = nginx
-    catch_workers_output = yes
-    pm = dynamic
-    pm.max_children = 20
-    pm.start_servers = 5
-    pm.min_spare_servers = 5
-    pm.max_spare_servers = 10
-    pm.max_requests = 500
-    chdir = /srv/mapas
-    php_admin_value[session.save_path] = /tmp/
-    php_admin_value[error_log] = /var/log/mapasculturais/php.error.log
-    php_admin_flag[log_errors] = on
-    php_admin_value[display_errors] = 'stderr'
+  listen = /var/run/php-fpm/mapas.sock
+  listen.owner = mapas
+  listen.group = nginx
+  user = mapas
+  group = nginx
+  catch_workers_output = yes
+  pm = dynamic
+  pm.max_children = 20
+  pm.start_servers = 5
+  pm.min_spare_servers = 5
+  pm.max_spare_servers = 10
+  pm.max_requests = 500
+  chdir = /srv/mapas
+
+  php_admin_value[error_log] = /dados/mapas/logs/php.error.log
+  php_admin_flag[log_errors] = on
+  php_value[display_errors] = 'stderr'
+  php_value[memory_limit]= 6144M
+  php_admin_value[upload_max_filesize] = 10M
+  php_admin_value[post_max_size] = 10M
+
+  clear_env = no
+
+  env["APP_MODE"] = "production"
 ```
 
 ## 4. Banco de dados
@@ -483,3 +499,152 @@ chmod +x /srv/mapas/scripts/recreate-pending-pcache-cron.sh
 ```
 
 ### Pronto!! Após o procedimento você deverá ser capaz de acessar o sistema com servidor web, php, base de dados, autenticação e serviço de permissoes funcionando
+
+
+## 7. Redis Server
+
+_Nota: Utilizaremos o redis para armazenar as sessões do php
+
+### NO SERVIDOR REDIS
+
+#### Instalação
+
+```console
+  root@server# yum install epel-release -y
+  root@server# yum update
+  root@server# yum install redis -y
+  root@server# vi /etc/redis.conf
+```
+
+```txt
+  Na linha , Adicionar o IP da rede do servidor redis
+  bind 127.0.0.1 IP DO SERVIDOR
+
+  Na linha , Adicionar a senha do servidor redis
+  requirepass SENHA
+```
+
+```console
+  root@server# systemctl enable redis
+  root@server# systemctl start redis
+  root@server# systemctl status redis
+  root@server#
+  root@server#
+  root@server#
+```
+
+#### Testar portas
+
+```console
+  root@server# netstat -tlpn
+  root@server# ss -an | grep 6379
+```
+
+#### Se for preciso alterar o firewall com zona
+
+```console
+  root@server# firewall-cmd --permanent --new-zone=redis
+  root@server# firewall-cmd --permanent --zone=redis --add-port=6379/tcp
+  root@server# firewall-cmd --permanent --zone=redis --add-source=client_server_private_IP
+  root@server# firewall-cmd --reload
+```
+
+#### Se for preciso alterar o firewall sem zona
+
+```console
+  root@server# firewall-cmd --permanent --zone=public --add-port=6379/tcp 
+  root@server# irewall-cmd  --reload
+```
+
+#### Se for preciso alterar o firewall com iptables
+
+```console
+  root@server# iptables -A INPUT -i lo -j ACCEPT
+  root@server# iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+  root@server# iptables -A INPUT -p tcp -s client_servers_private_IP/32 --dport 6379 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+  root@server# iptables -P INPUT DROP
+```
+
+#### Testando Redis com senha de autenticação
+
+_Nota: Utilizamos o redis-cli para acessar o servidor redis , será preciso informar a senha que configuramos anteriormente, em seguida execute o comando ping, se tudo estiver correto o servidor responderá com "PONG"
+
+```console
+  root@server# redis-cli -h IP DO SERVIDOR -p 6379
+  root@server# AUTH SENHA
+  root@server# OK
+  root@server# ping
+  root@server# PONG
+```
+
+### NO CLIENTE
+
+#### Instalar um client redis ( No caso do servidor redis ser diferente do servidor do sistema)
+
+```console
+  root@server# npm install -g redis-cli
+```
+
+#### Testar o acesso com senha ( No caso do servidor redis ser diferente do servidor do sistema)
+
+```console
+  root@server# rdcli -h IP DO SERVIDOR -p 6379 -a SENHA
+  redis$ ping
+  redis$ PONG
+```
+
+#### Configurar o php com redis
+
+```console
+  root@server# vi /etc/php.ini
+```
+
+```txt
+  session.save_handler = redis
+  session.save_path = "tcp://REDIS_IP_SERVER:6379?auth=REDIS_SENHA"
+```
+
+#### Configurar o php-fpm com redis
+
+```console
+  root@server# vi /etc/php-fpm.d/mapa.conf
+```
+
+##### Adicionar no fim do arquivo
+
+```txt
+[mapas]
+
+php_admin_value[session.save_path] = "tcp://REDIS_IP_SERVER:6379?auth=REDIS_SENHA"
+php_admin_value[session.save_handler ] = redis
+env["SESSIONS_SAVE_PATH"] = "tcp://REDIS_IP_SERVER:6379?auth=REDIS_SENHA"
+
+```
+
+#### Alterar script do servico de permissoes com configuracoes do redis
+
+```console
+  root@server# vi /srv/mapas/scripts/recreate-pending-pcache-cron.sh
+```
+
+```txt
+  #!/bin/bash
+
+  export APP_MODE='development'
+  export SESSIONS_SAVE_PATH='tcp://172.20.12.98:6379?auth=209P#WGEVZe4jFLz@21'
+
+  while [ true ]; do
+      /srv/mapas/mapasculturais/scripts/recreate-pending-pcache.sh
+      if [ -z "$PENDING_PCACHE_RECREATION_INTERVAL" ]; then
+          sleep 5
+      else
+          sleep $PENDING_PCACHE_RECREATION_INTERVAL
+      fi
+  done
+```
+
+```console
+  root@server# systemctl daemon-reload
+  root@server# systemctl restart recreate-pcache.service
+  root@server# systemctl status recreate-pcache.service -l
+```

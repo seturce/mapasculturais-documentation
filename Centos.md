@@ -164,9 +164,8 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
 
 ```txt
   server {
-    listen 80 default_server;
-    listen [::]:80 default_server;  
-    server_name mapacultural.secult.ce.gov.br;
+    listen *:80;
+
     access_log /var/log/nginx/mapas.access.log;
     error_log  /var/log/nginx/mapas.error.log;
 
@@ -175,9 +174,9 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
     root /srv/mapas/mapasculturais/src/;
     index index.php;
 
-    location / {  
+    location / {
       try_files $uri $uri/ /index.php?$args;
-    }	
+    }
 
     location ~ /files/.*\.php$ {
       deny all;
@@ -198,7 +197,7 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
     }
 
     charset utf-8;
-  }
+}
 ```
 
 #### Configurações com domínio

@@ -25,7 +25,7 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
   
 ```console
   root@server# yum install yum-utils -y
-  root@server# yum install git curl gcc-c++ make zip unzip -y 
+  root@server# yum install git curl gcc-c++ make zip unzip wget nano -y 
 ```
 
 ### Instale a versão stable mais nova do nodejs

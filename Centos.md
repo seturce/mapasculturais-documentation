@@ -18,7 +18,7 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
 ```console
   root@server# cd ~
   root@server# yum update -y
-  root@server# yum install epel-release
+  root@server# yum install epel-release -y
 ```
 
 ### Instale as dependências

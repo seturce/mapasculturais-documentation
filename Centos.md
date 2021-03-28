@@ -509,7 +509,7 @@ _Nota: Utilizaremos o redis para armazenar as sessões do php
 
 ```console
   root@server# yum install epel-release -y
-  root@server# yum update
+  root@server# yum update -y
   root@server# yum install redis -y
   root@server# vi /etc/redis.conf
 ```

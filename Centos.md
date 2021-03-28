@@ -109,6 +109,16 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
   mapas@server# git clone https://github.com/seturce/theme-Ceara.git Ceara
   mapas@server# cd ~/mapasculturais/src/protected/application/plugins
   mapas@server# git clone https://github.com/secultce/plugin-MultipleLocalAuth.git MultipleLocalAuth
+  mapas@server# exit
+```
+### Liberar permissoes e acesso externo
+
+```console
+  root@server# chown -R mapas:nginx /srv/
+  root@server# chmod -R 755 /srv/
+  root@server# setsebool httpd_read_user_content on
+  root@server# getenforce
+  root@server# setenforce Permissive
 ```
 
 ### Com o usuário criado, crie a pasta para os assets, para os uploads e para os uploads privados (arquivos protegidos, como anexos de inscrições em oportunidades)

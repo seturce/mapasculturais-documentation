@@ -80,6 +80,7 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
   root@server# cd ~
   root@server# curl -sS https://getcomposer.org/installer | php
   root@server# mv composer.phar /usr/bin/composer
+  root@server# composer --version
 ```
 
 ### PHP Configs

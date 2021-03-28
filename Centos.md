@@ -55,8 +55,6 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
   root@server# yum install nginx -y
   root@server# systemctl start nginx
   root@server# systemctl enable nginx
-  root@server# iptables -I INPUT -p tcp --dport 80 -j ACCEPT
-  root@server# iptables -nL | grep 80
 ```
 
 ### Instale o php7.2, php7.2-fpm, extensões do php utilizadas no sistema e gerenciador de dependências do PHP Composer
@@ -119,6 +117,8 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
   root@server# setsebool httpd_read_user_content on
   root@server# getenforce
   root@server# setenforce Permissive
+  root@server# iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+  root@server# iptables -nL | grep 80
 ```
 
 ### Com o usuário criado, crie a pasta para os assets, para os uploads e para os uploads privados (arquivos protegidos, como anexos de inscrições em oportunidades)

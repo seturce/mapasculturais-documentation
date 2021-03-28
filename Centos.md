@@ -72,8 +72,6 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
 
 ```console
   root@server# wget http://rpms.remirepo.net/enterprise/remi-release-7.rpm
-  root@server# yum -y install epel-release
-  root@server# rpm -Uvh epel-release-latest-7.noarch.rpm
   root@server# rpm -Uvh remi-release-7.rpm
   root@server# yum-config-manager --enable remi-php72
   root@server# yum install php php-fpm php-pdo php-json php-common php-cli php-xml php-pgsql php-mbstring php-mcrypt php-pecl-apcu php-pecl-imagick php-opcache php-doctrine-orm php-pecl-zip php-mysql -y

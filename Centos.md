@@ -577,6 +577,13 @@ _Nota: Utilizamos o redis-cli para acessar o servidor redis , será preciso info
 
 ### NO CLIENTE
 
+#### Instalar php redis
+```console
+  root@server# yum install php-pecl-redis -y
+  root@server# systemctl restart php-fpm
+  root@server# systemctl reload php-fpm
+```
+
 #### Instalar um client redis ( No caso do servidor redis ser diferente do servidor do sistema)
 
 ```console
@@ -629,7 +636,7 @@ env["SESSIONS_SAVE_PATH"] = "tcp://REDIS_IP_SERVER:6379?auth=REDIS_SENHA"
   #!/bin/bash
 
   export APP_MODE='development'
-  export SESSIONS_SAVE_PATH='tcp://172.20.12.98:6379?auth=209P#WGEVZe4jFLz@21'
+  export SESSIONS_SAVE_PATH='tcp://IP_REDIS:6379?auth=SENHA_REDIS'
 
   while [ true ]; do
       /srv/mapas/mapasculturais/scripts/recreate-pending-pcache.sh

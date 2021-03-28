@@ -71,7 +71,6 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
 ```
 
 ```console
-  root@server# wget https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-7-12.noarch.rpm
   root@server# wget http://rpms.remirepo.net/enterprise/remi-release-7.rpm
   root@server# yum -y install epel-release
   root@server# rpm -Uvh epel-release-latest-7.noarch.rpm

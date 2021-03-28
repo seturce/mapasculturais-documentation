@@ -45,7 +45,7 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
 ### Instalando os minificadores de código Javascript, CSS e SASS
   
 ```console
-  root@server# npm install -g uglify-js uglifycss autoprefixer terser
+  root@server# npm install -g uglify-js uglifycss autoprefixer terser postcss
   root@server# yum install rubygem-sass -y
 ```
   

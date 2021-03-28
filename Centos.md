@@ -78,7 +78,7 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
   root@server# systemctl start php-fpm
   root@server# systemctl enable php-fpm
   root@server# cd ~
-  root@server# url -sS https://getcomposer.org/installer | php
+  root@server# curl -sS https://getcomposer.org/installer | php
   root@server# mv composer.phar /usr/bin/composer
 ```
 

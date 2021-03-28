@@ -102,11 +102,16 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
   root@server# su - mapas
   mapas@server# git clone https://github.com/secultce/mapasculturais.git
   mapas@server# cd ~/mapasculturais
+  mapas@server# git config core.filemode false
   mapas@server# git checkout production
   mapas@server# cd ~/mapasculturais/src/protected/application/themes
   mapas@server# git clone https://github.com/seturce/theme-Ceara.git Ceara
+  mapas@server# cd ~/mapasculturais/src/protected/application/themes/Ceara
+  mapas@server# git config core.filemode false
   mapas@server# cd ~/mapasculturais/src/protected/application/plugins
   mapas@server# git clone https://github.com/secultce/plugin-MultipleLocalAuth.git MultipleLocalAuth
+  mapas@server# cd ~/mapasculturais/src/protected/application/plugins/MultipleLocalAuth
+  mapas@server# git config core.filemode false
   mapas@server# exit
 ```
 ### Liberar permissoes e acesso externo

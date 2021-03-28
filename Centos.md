@@ -38,7 +38,7 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
 ### Verificando se foi instalada a versão mais recente do NodeJS e do NPM
   
 ```console
-  root@server# nodejs -v
+  root@server# node -v
   root@server# npm -v
 ```
 

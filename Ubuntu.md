@@ -228,9 +228,9 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
     }
     
     location ~ /files/.*\.php$ {
-      return 80;
+      deny all;
+      return 403;
     }
-    
 
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|woff)$ {
             expires 1w;

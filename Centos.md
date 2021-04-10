@@ -188,12 +188,13 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
       log_not_found off;
     }
 
-    location ~ \.php$ {
+     location ~ \.php$ {           
       try_files $uri =404;
       include fastcgi_params;
       fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
       fastcgi_pass unix:/var/run/php-fpm/mapas.sock;
       client_max_body_size 10M;
+      fastcgi_read_timeout 3600;
     }
 
     charset utf-8;
@@ -233,7 +234,8 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
       include fastcgi_params;
       fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
       fastcgi_pass unix:/var/run/php-fpm/mapas.sock;
-      client_max_body_size 0;
+      client_max_body_size 10M;
+      fastcgi_read_timeout 3600;
     }
 
     charset utf-8;

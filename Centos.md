@@ -273,6 +273,9 @@ _Essa máquina foi criada apenas para efetuarmos testes iniciais e fazer a prime
   pm.max_spare_servers = 10
   pm.max_requests = 500
   chdir = /srv/mapas
+  
+  php_value[max_execution_time] = 600
+  php_value[max_input_time] = 600
 
   php_admin_value[error_log] = /dados/mapas/logs/php.error.log
   php_admin_flag[log_errors] = on
